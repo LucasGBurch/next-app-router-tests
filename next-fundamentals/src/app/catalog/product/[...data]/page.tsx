@@ -1,4 +1,5 @@
-'use client'
+import { AddToCartButton } from './add-to-cart-button'
+import { Test } from './test'
 
 interface ProductProps {
   params: {
@@ -14,18 +15,17 @@ interface ProductProps {
 
 // Renderizar um componente pelo lado do servidor de forma PARCIAL
 
-export default function Product({ params }: ProductProps) {
+export default async function Product({ params }: ProductProps) {
   const [productId, size, color] = params.data
 
-  console.log(params)
+  const response = await fetch('https://api.github.com/users/LucasGBurch')
+  const user = await response.json()
+
+  console.log(params, user.login)
   // Sem o use-client em cima, o log vem no terminal, pois o componente é Server Component
   // Ou seja, não usa JS no client-side
   // Se chamasse uma função com onClick de um button para fazer esse console, já precisaria do 'use client' para funcionar
   // No caso, enviar o JS para o navegador
-
-  function addToCart() {
-    console.log('Adicionou ao carrinho')
-  }
 
   // Exemplo do exibido através dos parâmetros da URL:
   // http://localhost:3000/catalog/product/3/xl/blue
@@ -35,7 +35,9 @@ export default function Product({ params }: ProductProps) {
       <p>Size: {size}</p>
       <p>Color: {color} </p>
 
-      <button onClick={addToCart}>Adicionar ao carrinho</button>
+      <AddToCartButton>
+        <Test />
+      </AddToCartButton>
     </div>
   )
 }
