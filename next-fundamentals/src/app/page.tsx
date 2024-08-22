@@ -1,8 +1,24 @@
+import { Suspense } from 'react'
+
+import { GithubProfile } from '@/components/github-profile'
+import { LongWaitComponent } from '@/components/long-wait-component'
+
 export default async function Home() {
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  // Para "carregando geral", usamos o layout da home mesmo
+  await new Promise((resolve) => setTimeout(resolve, 1000))
 
-  const response = await fetch('https://api.github.com/users/LucasGBurch')
-  const user = await response.json()
+  return (
+    <div>
+      <h1>Home</h1>
 
-  return <pre>{JSON.stringify(user, null, 2)}</pre>
+      {/* Para carregar partes específicas, usamos a Suspense API */}
+      <Suspense fallback={<p>Carregando LongWaitComponent</p>}>
+        <LongWaitComponent />
+      </Suspense>
+
+      <Suspense fallback={<p>Carregando GithubProfile</p>}>
+        <GithubProfile />
+      </Suspense>
+    </div>
+  )
 }
