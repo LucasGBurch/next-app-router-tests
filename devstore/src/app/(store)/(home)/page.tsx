@@ -4,7 +4,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 async function getFeaturedProducts(): Promise<Product[]> {
-  const response = await api('/products/featured')
+  const response = await api('/products/featured', {
+    // cache: 'force-cache', // Padrão - faz a requisição uma vez e deixa "cacheada" por tempo indeterminado
+    next: {
+      revalidate: 60 * 60, // Segundos - durante esse tempo, os dados acessados serão do usuário que acessou na primeira vez. Depois desse tempo, os próximos acessos pegarão novamente para uma nova cache. (Exemplo: 60 * 60 atualiza o cache a cada 1h)
+    }, // NÃO-RECOMENDÁVEL para os casos em tempo real que mudam, que nem as sugestões que mudam no youtube ou em sites de e-commerce mais personalizados
+  })
 
   const products = await response.json()
 
