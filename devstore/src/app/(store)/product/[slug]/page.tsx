@@ -1,11 +1,34 @@
+import { api } from '@/data/api'
+import { Product } from '@/data/types/product'
 import Image from 'next/image'
 
-export default function ProductPage() {
+interface ProductProps {
+  params: {
+    slug: string
+  }
+}
+
+async function getProduct(slug: string): Promise<Product> {
+  const response = await api(`/products/${slug}`, {
+    // cache: 'force-cache', // Padrão - faz a requisição uma vez e deixa "cacheada" por tempo indeterminado
+    next: {
+      revalidate: 60 * 60, // Segundos - durante esse tempo, os dados acessados serão do usuário que acessou na primeira vez. Depois desse tempo, os próximos acessos pegarão novamente para uma nova cache. (Exemplo: 60 * 60 atualiza o cache a cada 1h)
+    }, // NÃO-RECOMENDÁVEL para os casos em tempo real que mudam, que nem as sugestões que mudam no youtube ou em sites de e-commerce mais personalizados
+  })
+
+  const product = await response.json()
+
+  return product
+}
+
+export default async function ProductPage({ params }: ProductProps) {
+  const product = getProduct(params.slug)
+
   return (
     <div className="relative grid max-h-[860px] grid-cols-3">
       <div className="col-span-2 overflow-hidden">
         <Image
-          src="/moletom-never-stop-learning.png"
+          src={(await product).image}
           alt=""
           width={1000}
           height={1000}
@@ -15,19 +38,27 @@ export default function ProductPage() {
 
       <div className="flex flex-col justify-center px-12">
         <h1 className="text-3xl font-bold leading-tight">
-          Moletom Never Stop Learning
+          {(await product).title}
         </h1>
 
         <p className="mt-2 leading-relaxed text-zinc-400">
-          Moletom fabricado com 88% de algodão e 12% de poliéster.
+          {(await product).description}
         </p>
 
         <div className="mt-8 flex items-center gap-3">
           <span className="inline-block rounded-full bg-violet-500 px-5 py-2.5 font-semibold">
-            R$129
+            {(await product).price.toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            })}
           </span>
           <span className="text-sm text-zinc-400">
-            Em 12x s/ juros de R$10,75
+            {((await product).price / 12).toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            })}
           </span>
         </div>
 
