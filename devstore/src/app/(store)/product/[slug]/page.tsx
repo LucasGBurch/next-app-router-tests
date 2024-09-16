@@ -32,6 +32,20 @@ export async function generateMetadata({
   }
 }
 
+export async function generateStaticParams() {
+  // Método para "cachear" a página dentro do next.js
+  // Usado só para dados essenciais, para não tornar a build muito pesada
+  // Exemplo: 20 produtos mais acessados, e não os 1000 do banco inteiro
+  const response = await api('/products/featured')
+  const products: Product[] = await response.json()
+
+  // return [{ slug: 'moletom-never-stop-learning' }]
+
+  return products.map((product) => {
+    return { slug: product.slug }
+  })
+}
+
 export default async function ProductPage({ params }: ProductProps) {
   const product = getProduct(params.slug)
 
