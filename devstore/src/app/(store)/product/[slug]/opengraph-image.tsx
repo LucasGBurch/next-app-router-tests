@@ -49,6 +49,7 @@ export default async function OgImage({
           flexDirection: 'column',
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={productImageURL} alt="" style={{ width: '100%' }} />
       </div>
     ),
